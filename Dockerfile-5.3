@@ -1,4 +1,4 @@
-FROM phusion/baseimage:latest
+FROM phusion/baseimage:0.11
 
 LABEL maintainer="Pavel Gavrilenko <paulgavrilenko@gmail.com>"
 
@@ -82,5 +82,7 @@ USER xcdocker
 RUN mkdir ~/xdev && \
   cd ~/xdev && \
   composer require xcart/xdev
+
+COPY ssh/config /home/xcdocker/.ssh/config
 
 USER root

@@ -1,0 +1,5 @@
+Host bitbucket.org
+ IdentityFile /etc/shared/x-service-shared/id_rsa_bitbucket
+ 
+Host github.com
+ IdentityFile /etc/shared/x-service-shared/id_rsa_github
