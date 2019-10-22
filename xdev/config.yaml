@@ -1,0 +1,10 @@
+web_root_dir: '/var/www'
+deploy_dir: '{web_root_dir}/html'
+http_host: 'xcart5.local'
+db_host: mysqlhost
+db_name: '{project}_{branch}'
+db_socket: ''
+db_port: ''
+db_user: 'root'
+db_pass: 'pass'
+php_path: php

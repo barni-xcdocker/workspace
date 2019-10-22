@@ -83,6 +83,20 @@ RUN mkdir ~/xdev && \
   cd ~/xdev && \
   composer require xcart/xdev
 
+#--------------------------------------------------------------------------
+# Home dir setup
+#--------------------------------------------------------------------------
+#
 COPY ssh/config /home/xcdocker/.ssh/config
 
+COPY --chown=xcdocker ./bash/.bash_aliases /home/xcdocker/.bash_aliases
+
+COPY --chown=xcdocker ssh/config /home/xcdocker/.ssh/config
+
+RUN mkdir /home/xcdocker/.xdev
+
+COPY --chown=xcdocker xdev/* /home/xcdocker/.xdev/
+
 USER root
+
+RUN chown -R xcdocker:xcdocker /home/xcdocker/.ssh
