@@ -1,0 +1,7 @@
+#
+#Bash auto-start commands
+#
+if  [[ $XDEV_CMD_DEPLOY == 'Y' ]]; then
+  xdev deploy $XDEV_CMD_DEPLOY_ARG_BRANCH
+fi
+

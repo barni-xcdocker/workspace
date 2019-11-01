@@ -91,6 +91,11 @@ COPY ssh/config /home/xcdocker/.ssh/config
 
 COPY --chown=xcdocker ./bash/.bash_aliases /home/xcdocker/.bash_aliases
 
+COPY --chown=xcdocker ./bash/bash_autostart /home/xcdocker/tmp_bash_autostart
+
+RUN echo "$(cat /home/xcdocker/tmp_bash_autostart)" >> /home/xcdocker/.bashrc && \
+  rm /home/xcdocker/tmp_bash_autostart
+
 COPY --chown=xcdocker ssh/config /home/xcdocker/.ssh/config
 
 RUN mkdir /home/xcdocker/.xdev
