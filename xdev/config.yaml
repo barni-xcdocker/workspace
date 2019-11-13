@@ -7,4 +7,5 @@ db_socket: ''
 db_port: ''
 db_user: 'root'
 db_pass: 'pass'
-php_path: php
+php_cmd: 'php'
+box_cmd: 'php /home/xcdocker/box/vendor/bin/box'
