@@ -108,4 +108,6 @@ COPY --chown=xcdocker xdev/* /home/xcdocker/.xdev/
 
 USER root
 
+COPY ./php/xc5.3/php.ini /etc/php/7.2/cli/php.ini
+
 RUN chown -R xcdocker:xcdocker /home/xcdocker/.ssh
