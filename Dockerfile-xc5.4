@@ -1,8 +1,8 @@
-FROM phusion/baseimage:0.11
+FROM phusion/baseimage:focal-1.0.0
 
 LABEL maintainer="Pavel Gavrilenko <paulgavrilenko@gmail.com>"
 
-RUN DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 RUN locale-gen en_US.UTF-8
 
 ENV LANGUAGE=en_US.UTF-8
@@ -22,21 +22,26 @@ RUN apt-get install -y software-properties-common && \
 #
 
 # Install "PHP Extentions", "libraries", "Software's"
-RUN apt-get update && \
-    apt-get upgrade -y --option=Dpkg::Options::="--force-confold" && \
-    apt-get install -y --allow-downgrades --allow-remove-essential \
+RUN set -eux \
+    # Add the "PHP 7" ppa
+    && apt-get install -y software-properties-common \
+    && add-apt-repository -y ppa:ondrej/php \
+    && echo 'DPkg::options { "--force-confdef"; };' >> /etc/apt/apt.conf \
+    # Install "PHP Extentions", "libraries", "Software's"
+    && apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y --allow-downgrades --allow-remove-essential \
         --allow-change-held-packages \
-        php7.3-cli \
-        php7.3-common \
-        php7.3-curl \
-        php7.3-json \
-        php7.3-xml \
-        php7.3-mbstring \
-        php7.3-mysql \
-        php7.3-zip \
-        php7.3-memcached \
-        php7.3-gd \
-        php7.3-dev \
+        php7.4-cli \
+        php7.4-common \
+        php7.4-curl \
+        php7.4-json \
+        php7.4-xml \
+        php7.4-mbstring \
+        php7.4-mysql \
+        php7.4-zip \
+        php7.4-memcached \
+        php7.4-gd \
         pkg-config \
         libcurl4-openssl-dev \
         libedit-dev \
@@ -44,7 +49,6 @@ RUN apt-get update && \
         libxml2-dev \
         git \
         curl \
-        vim \
         nano \
         iputils-ping \
     && apt-get clean
@@ -52,7 +56,6 @@ RUN apt-get update && \
 RUN apt-get install -yqq \
   apt-utils \
   libzip-dev zip unzip \
-  php7.3-zip \
   wget
 
 # MySQL Client:
@@ -114,6 +117,6 @@ COPY --chown=xcdocker xdev/* /home/xcdocker/.xdev/
 
 USER root
 
-COPY ./php/xc5.4/php.ini /etc/php/7.3/cli/php.ini
+COPY ./php/xc5.4/php.ini /etc/php/7.4/cli/php.ini
 
 RUN chown -R xcdocker:xcdocker /home/xcdocker/.ssh
