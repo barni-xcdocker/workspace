@@ -1,0 +1,105 @@
+FROM phusion/baseimage:focal-1.0.0
+
+LABEL maintainer="Pavel Gavrilenko <paulgavrilenko@gmail.com>"
+
+RUN DEBIAN_FRONTEND=noninteractive
+RUN locale-gen en_US.UTF-8
+
+ENV LANGUAGE=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+ENV LC_CTYPE=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV TERM xterm
+
+RUN set -eux \
+    # Add the "PHP 8" ppa
+    && apt-get install -y software-properties-common \
+    && add-apt-repository -y ppa:ondrej/php \
+#
+#--------------------------------------------------------------------------
+# Software's Installation
+#--------------------------------------------------------------------------
+#
+    && echo 'DPkg::options { "--force-confdef"; };' >> /etc/apt/apt.conf \
+# Install "PHP Extentions", "libraries", "Software's"
+   && apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y --allow-downgrades --allow-remove-essential \
+        --allow-change-held-packages \
+        php8.3-cli \
+        php8.3-common \
+        php8.3-curl \
+        php8.3-intl \
+        php8.3-xml \
+        php8.3-mbstring \
+        php8.3-mysql \
+        php8.3-pgsql \
+        php8.3-sqlite \
+        php8.3-sqlite3 \
+        php8.3-zip \
+        php8.3-bcmath \
+        php8.3-memcached \
+        php8.3-gd \
+        php8.3-dev \
+        pkg-config \
+        libcurl4-openssl-dev \
+        libedit-dev \
+        libssl-dev \
+        libxml2-dev \
+        git \
+        curl \
+        vim \
+        nano \
+        iputils-ping \
+    && apt-get clean \
+    && update-alternatives --set php /usr/bin/php8.3
+
+RUN apt-get install -yqq \
+  apt-utils \
+  libzip-dev zip unzip \
+  wget \
+  && apt-get clean
+
+# MySQL Client:
+RUN apt-get update -yqq && \
+  apt-get -y install mysql-client
+
+COPY mysql/mysql.cnf /etc/mysql/conf.d/mysql.cnf
+
+# Sendmail client for mailhog:
+RUN wget https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 \
+ && chmod +x mhsendmail_linux_amd64 \
+ && mv mhsendmail_linux_amd64 /usr/local/bin/mhsendmail
+
+# Install composer and add its bin to the PATH.
+RUN curl -s http://getcomposer.org/installer | php && \
+    echo "export PATH=${PATH}:/var/www/vendor/bin" >> ~/.bashrc && \
+    mv composer.phar /usr/local/bin/composer
+
+# Add a non-root user to prevent files being created with root permissions on host machine.
+ARG PUID=1000
+ENV PUID ${PUID}
+ARG PGID=1000
+ENV PGID ${PGID}
+
+RUN groupadd -g ${PGID} xcdocker
+RUN useradd -u ${PUID} -g xcdocker -m xcdocker -G docker_env    
+RUN usermod -p "*" xcdocker -s /bin/bash
+
+USER xcdocker
+
+#--------------------------------------------------------------------------
+# Home dir setup
+#--------------------------------------------------------------------------
+#
+COPY ssh/config /home/xcdocker/.ssh/config
+
+COPY --chown=xcdocker ./bash/.bash_aliases /home/xcdocker/.bash_aliases
+
+COPY --chown=xcdocker ssh/config /home/xcdocker/.ssh/config
+
+USER root
+
+COPY ./php/83/php.ini /etc/php/8.3/cli/php.ini
+
+RUN chown -R xcdocker:xcdocker /home/xcdocker/.ssh
